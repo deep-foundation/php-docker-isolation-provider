@@ -1,0 +1,6 @@
+vendor/
+.github
+result.png
+.env
+checklist.md
+README.md
