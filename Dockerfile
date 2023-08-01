@@ -4,8 +4,8 @@ FROM php:8.1-fpm-alpine
 # Install dependencies
 COPY composer.json composer.lock /var/www/html/
 WORKDIR /var/www/html
-RUN apt-get update && \
-    apt-get install -y git && \
+RUN apk update && \
+    apk add --no-cache git && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     composer install --no-scripts --no-autoloader
 
