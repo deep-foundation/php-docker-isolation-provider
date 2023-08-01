@@ -18,5 +18,5 @@ ENV GQL_SSL=0
 
 EXPOSE 9000
 
-# Start Fpm
-CMD ["php-fpm"]
+# Start PHP-FPM and keep it running with a long-running command
+CMD ["php-fpm", "-F"]
