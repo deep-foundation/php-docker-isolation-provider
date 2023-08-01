@@ -12,6 +12,7 @@ RUN apk update && \
 # Copy the source code into the container
 COPY . /var/www/html
 # Copy the custom www.conf into the image
+RUN rm -f /usr/local/etc/php-fpm.d/*
 COPY zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Set environment variables
