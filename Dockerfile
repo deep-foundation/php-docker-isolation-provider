@@ -1,6 +1,20 @@
 # Use a base PHP image
 FROM php:8.1-fpm-alpine
 
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN chmod uga+x /usr/local/bin/install-php-extensions && sync
+# Install dependencies
+RUN install-php-extensions \
+bcmath \
+pdo_mysql \
+pdo_pgsql \
+gd \
+exif \
+redis \
+pcntl \
+zip \
+mbstring
+
 # Install dependencies
 COPY composer.json composer.lock /var/www/html/
 WORKDIR /var/www/html
