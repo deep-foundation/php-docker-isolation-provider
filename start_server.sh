@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Function to update PHP-FPM configuration with the specified port
 function update_php_fpm_port {
     local port="$1"

@@ -35,10 +35,10 @@ RUN rm -f /usr/local/etc/php-fpm.d/*
 COPY docker.conf /usr/local/etc/php-fpm.d/docker.conf
 
 # Copy the start_server.sh script into the image
-COPY start.sh /usr/local/etc/start.sh
+COPY start_server.sh /usr/local/bin/start_server.sh
 
 # Make the script executable
-RUN chmod +x /usr/local/etc/start.sh
+RUN chmod +x /usr/local/bin/start_server.sh
 
 # Set the script as the entry point for the container
-ENTRYPOINT ["/usr/local/etc/start.sh"]
+ENTRYPOINT ["/usr/local/bin/start_server.sh"]
