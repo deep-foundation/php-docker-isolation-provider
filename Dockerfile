@@ -43,5 +43,4 @@ RUN { \
     echo "listen = 0.0.0.0:${PORT}"; \
 } > /usr/local/etc/php-fpm.d/zz-docker.conf
 
-# Set memory limit to 30MB
-CMD ["sh", "-c", "php-fpm -F -d memory_limit=30M"]
+CMD ["php-fpm"]
