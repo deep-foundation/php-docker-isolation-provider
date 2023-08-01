@@ -1,6 +1,10 @@
 # Use a base PHP image
 FROM php:8.1-fpm-alpine
 
+# Set environment variables
+ENV GQL_URN="localhost:3006/gql"
+ENV GQL_SSL=0
+
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 RUN chmod uga+x /usr/local/bin/install-php-extensions && sync
 # Install dependencies
@@ -28,17 +32,13 @@ COPY . /var/www/html
 # Copy the custom www.conf into the image
 RUN rm -f /usr/local/etc/php-fpm.d/*
 
-# Set environment variables
-ENV GQL_URN="localhost:3006/gql"
-ENV GQL_SSL=0
-
 COPY docker.conf /usr/local/etc/php-fpm.d/docker.conf
 
 # Copy the start_server.sh script into the image
-COPY start_server.sh /usr/local/bin/start_server.sh
+COPY start_server.sh /usr/local/etc/start_server.sh
 
 # Make the script executable
-RUN chmod +x /usr/local/bin/start_server.sh
+RUN chmod +x /usr/local/etc/start_server.sh
 
 # Set the script as the entry point for the container
-ENTRYPOINT ["/usr/local/bin/start_server.sh"]
+ENTRYPOINT ["/usr/local/etc/start_server.sh"]
