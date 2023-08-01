@@ -11,12 +11,15 @@ RUN apk update && \
 
 # Copy the source code into the container
 COPY . /var/www/html
+# Copy the custom www.conf into the image
+COPY zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Set environment variables
 ENV GQL_URN="localhost:3006/gql"
 ENV GQL_SSL=0
 
-EXPOSE 9090
+# Set memory limit to 30MB
+CMD ["php-fpm", "-F", "-d", "memory_limit=30M"]
 
-# Start PHP-FPM and keep it running with a long-running command
-CMD ["php-fpm", "-F"]
+# Expose port 9090
+EXPOSE 9090
