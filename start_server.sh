@@ -13,11 +13,9 @@ function restart_php_fpm {
     php-fpm -R
 }
 
-# Check if the "PORT" environment variable is set
-if [[ -z "${PORT}" ]]; then
-    echo "Error: Environment variable PORT is not set. Exiting."
-    exit 1
-fi
+# Set default port if "PORT" environment variable is not set
+DEFAULT_PORT=9090
+PORT=${PORT:-$DEFAULT_PORT}
 
 # Call the function to update PHP-FPM port with the specified value
 update_php_fpm_port "${PORT}"
