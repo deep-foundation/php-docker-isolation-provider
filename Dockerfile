@@ -1,5 +1,5 @@
 # Use a base PHP image
-FROM php:8.1-apache
+FROM php:8.1-fpm-alpine
 
 # Install dependencies
 COPY composer.json composer.lock /var/www/html/
@@ -16,11 +16,7 @@ COPY . /var/www/html
 ENV GQL_URN="localhost:3006/gql"
 ENV GQL_SSL=0
 
-# Configure Apache
-RUN a2enmod rewrite
+EXPOSE 9000
 
-# Set the port on which the application will run
-ENV PORT=80
-
-# Start Apache
-CMD ["apache2-foreground"]
+# Start Fpm
+CMD ["php-fpm"]

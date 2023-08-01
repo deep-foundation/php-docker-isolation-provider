@@ -4,7 +4,22 @@
     "description": "The skeleton application for the Laravel framework.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
+    "repositories": [
+        {
+            "type":"package",
+            "package": {
+                "name": "lotos2021/deepclient-test-php",
+                "version": "0.0.1",
+                "source": {
+                    "url": "https://github.com/Lotos2021/deepclient-test-php.git",
+                    "type": "git",
+                    "reference":"main"
+                }
+            }
+        }
+    ],
     "require": {
+        "lotos2021/deepclient-test-php": "0.0.1",
         "php": "^8.1",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
