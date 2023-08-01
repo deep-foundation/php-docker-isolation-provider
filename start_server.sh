@@ -23,9 +23,7 @@ PORT=${PORT:-$DEFAULT_PORT}
 # Call the function to update PHP-FPM port with the specified value
 update_php_fpm_port "${PORT}"
 
-sleep 1
-
 # Call the function to restart PHP-FPM
 restart_php_fpm
 
-sleep 100
+sleep 1
