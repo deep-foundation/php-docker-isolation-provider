@@ -32,15 +32,13 @@ RUN rm -f /usr/local/etc/php-fpm.d/*
 ENV GQL_URN="localhost:3006/gql"
 ENV GQL_SSL=0
 
-# Set default port 9090, which will be overridden if "PORT" environment variable is provided
-ENV PORT=9090
-
 COPY docker.conf /usr/local/etc/php-fpm.d/docker.conf
 
-# Create a custom www.conf file with the dynamic PHP-FPM port
-RUN { \
-    echo "[www]"; \
-    echo "listen = 0.0.0.0:${PORT}"; \
-} > /usr/local/etc/php-fpm.d/zz-docker.conf
+# Copy the start_server.sh script into the image
+COPY start_server.sh /usr/local/bin/start_server.sh
 
-CMD ["php-fpm"]
+# Make the script executable
+RUN chmod +x /usr/local/bin/start_server.sh
+
+# Set the script as the entry point for the container
+ENTRYPOINT ["/usr/local/bin/start_server.sh"]
