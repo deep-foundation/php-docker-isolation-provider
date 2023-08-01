@@ -4,7 +4,10 @@
 function update_php_fpm_port {
     local port="$1"
     echo "Updating PHP-FPM port to ${port}"
-    sed -i "s/^listen = 0.0.0.0:.*$/listen = 0.0.0.0:${port}/" /usr/local/etc/php-fpm.d/zz-docker.conf
+    cat > /usr/local/etc/php-fpm.d/zz-docker.conf << EOF
+[www]
+listen = 0.0.0.0:${port}
+EOF
 }
 
 # Function to restart PHP-FPM
