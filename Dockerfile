@@ -16,7 +16,7 @@ COPY . /var/www/html
 ENV GQL_URN="localhost:3006/gql"
 ENV GQL_SSL=0
 
-EXPOSE 9000
+EXPOSE 9090
 
 # Start PHP-FPM and keep it running with a long-running command
 CMD ["php-fpm", "-F"]
