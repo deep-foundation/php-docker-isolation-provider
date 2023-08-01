@@ -27,7 +27,6 @@ RUN apk update && \
 COPY . /var/www/html
 # Copy the custom www.conf into the image
 RUN rm -f /usr/local/etc/php-fpm.d/*
-COPY zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Set environment variables
 ENV GQL_URN="localhost:3006/gql"
@@ -35,6 +34,39 @@ ENV GQL_SSL=0
 
 # Set default port 9090, which will be overridden if "PORT" environment variable is provided
 ENV PORT=9090
+
+RUN cat << EOF > /usr/local/etc/php-fpm.d/zz-custom.conf
+[global]
+error_log = /proc/self/fd/2
+
+; https://github.com/docker-library/php/pull/725#issuecomment-443540114
+log_limit = 8192
+
+daemonize = no
+
+[www]
+; php-fpm closes STDOUT on startup, so sending logs to /proc/self/fd/1 does not work.
+; https://bugs.php.net/bug.php?id=73886
+access.log = /proc/self/fd/2
+
+clear_env = no
+
+; Ensure worker stdout and stderr are sent to the main error log.
+catch_workers_output = yes
+decorate_workers_output = no
+
+user = www-data
+group = www-data
+
+listen = 0.0.0.0:${PORT}
+
+pm = dynamic
+pm.max_children = 5
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3
+pm.max_requests = 50
+EOF
 
 # Set memory limit to 30MB and use the specified port
 CMD ["sh", "-c", "php-fpm -F -d memory_limit=30M -R $PORT"]
