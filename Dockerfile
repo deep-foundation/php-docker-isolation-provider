@@ -33,8 +33,8 @@ COPY zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 ENV GQL_URN="localhost:3006/gql"
 ENV GQL_SSL=0
 
-# Set memory limit to 30MB
-CMD ["php-fpm", "-F", "-d", "memory_limit=30M"]
+# Set default port 9090, which will be overridden if "PORT" environment variable is provided
+ENV PORT=9090
 
-# Expose port 9090
-EXPOSE 9090
+# Set memory limit to 30MB and use the specified port
+CMD ["sh", "-c", "php-fpm -F -d memory_limit=30M -R $PORT"]
