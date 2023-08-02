@@ -29,6 +29,9 @@ RUN apk update && \
 
 # Copy the source code into the container
 COPY . /var/www/html
+
+RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
+
 # Copy the custom www.conf into the image
 RUN rm -f /usr/local/etc/php-fpm.d/*
 

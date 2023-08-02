@@ -12,18 +12,30 @@ EOF
 
 # Function to restart PHP-FPM
 function restart_php_fpm {
+    local port="$1"
     echo "Restarting PHP-FPM..."
-    php-fpm -R
+    # php-fpm -R
+    cd /var/www/html
+    composer install
+    cp .env.example .env
+    key=$(php -r "echo base64_encode(random_bytes(32));")
+    echo "APP_KEY=base64:$key" >> .env
+    echo "Application key set successfully."
+
+    php artisan serve --host=0.0.0.0 --port="${port}"
 }
 
 # Set default port if "PORT" environment variable is not set
 DEFAULT_PORT=9090
 PORT=${PORT:-$DEFAULT_PORT}
 
+# Stop php-fpm
+kill -9 $(pgrep php-fpm)
+
 # Call the function to update PHP-FPM port with the specified value
 update_php_fpm_port "${PORT}"
 
 # Call the function to restart PHP-FPM
-restart_php_fpm
+restart_php_fpm "${PORT}"
 
 sleep 1
