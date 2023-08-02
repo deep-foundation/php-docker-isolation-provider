@@ -73,6 +73,13 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'deep' => [
+            'driver' => 'daily',
+            'path'   => storage_path('logs/deep/deep.log'),
+            'level'  => 'debug',
+            'days'   => 90,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

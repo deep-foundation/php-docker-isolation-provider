@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use GraphQL\Client;
-use GraphQL\QueryBuilder\QueryBuilder;
-use GraphQL\Transport\GuzzleHttpGQLHTTPTransport;
+//use GraphQL\Client;
+//use GraphQL\QueryBuilder\QueryBuilder;
+//use GraphQL\Transport\GuzzleHttpGQLHTTPTransport;
 
 class IsolationController extends Controller
 {
@@ -31,6 +32,13 @@ class IsolationController extends Controller
 
     public function call(Request $request)
     {
+        Log::channel('deep')->error(
+            json_encode([
+                'MESSAGE' => 'CALL.' . __METHOD__
+            ]),
+            [$request->all()]
+        );
+
         try {
             $body = json_decode($request->getContent(), true);
             $params = $body['params'];
@@ -44,5 +52,16 @@ class IsolationController extends Controller
         } catch (\Exception $e) {
             return new JsonResponse(['rejected' => $e->getTraceAsString()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private function execute_handler(mixed $code, array $args)
+    {
+        Log::channel('deep')->error(
+            json_encode([
+                'MESSAGE' => 'EXECUTE_HANDLER',
+                'CODE' => $code,
+                'ARGS' => $args
+            ])
+        );
     }
 }
