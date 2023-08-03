@@ -22,12 +22,12 @@ class IsolationController extends Controller
 
     public function healthz(): JsonResponse
     {
-        return new JsonResponse([]);
+        return new JsonResponse();
     }
 
     public function initialization(): JsonResponse
     {
-        return new JsonResponse([]);
+        return new JsonResponse();
     }
 
     public function call(Request $request)
