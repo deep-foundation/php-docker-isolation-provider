@@ -37,11 +37,11 @@ function make_deep_client($token)
 }
 
 $app->get('/healthz', function () {
-	return new JsonResponse([]);
+	return new JsonResponse();
 });
 
 $app->post('/init', function () {
-	return new JsonResponse([]);
+	return new JsonResponse();
 });
 
 $app->post('/call', function (Request $request) use ($app) {

@@ -28,3 +28,9 @@ docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
 docker pull deepf/js-docker-isolation-provider:main
 docker run -d -p 39090:39090 -e PORT=39090 deepf/js-docker-isolation-provider:main
 ```
+
+
+## Tests
+```bash
+php8.1 vendor/bin/phpunit tests/Feature/CallTest.php
+```
