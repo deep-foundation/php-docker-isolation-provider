@@ -20,15 +20,16 @@ zip \
 mbstring
 
 # Install dependencies
-COPY composer.json composer.lock /var/www/html/
-WORKDIR /var/www/html
 RUN apk update && \
     apk add --no-cache git && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-    composer install --no-scripts --no-autoloader
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+WORKDIR /var/www/html
 
 # Copy the source code into the container
 COPY . /var/www/html
+
+RUN composer install --no-scripts --no-autoloader
 
 RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
 
