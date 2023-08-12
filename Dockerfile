@@ -40,7 +40,7 @@ RUN rm -f /usr/local/etc/php-fpm.d/*
 
 # Copy the start_server.sh script into the image
 # Copy Nginx configuration file
-RUN mv /var/www/html/nginx.conf /etc/nginx/nginx.conf.new \
+RUN mv /var/www/html/nginx.conf /etc/nginx/nginx.conf \
     && mv /var/www/html/docker.conf /usr/local/etc/php-fpm.d/docker.conf \
     && mv /var/www/html/start_server.sh /usr/local/bin/start_server.sh
 
