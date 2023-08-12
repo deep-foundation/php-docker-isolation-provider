@@ -4,14 +4,14 @@
 function update_nginx_port {
     local port="$1"
     echo "Updating nginx port to ${port}"
-    sed -i "s/\$PORT/${PORT}/g" /etc/nginx/nginx.conf
+    awk -v port="$PORT" '{gsub(/\$\{PORT\}/, port)}1' /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp && mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
 }
 
 # Function to restart PHP-FPM
 function restart_php_fpm {
     local port="$1"
     echo "Restarting PHP-FPM..."
-    php-fpm && nginx -g 'daemon off;'
+    php-fpm && nginx
 }
 
 # Set default port if "PORT" environment variable is not set
