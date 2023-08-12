@@ -13,6 +13,7 @@ use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use GuzzleHttp\Client as GuzzleHttpClient;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
@@ -67,7 +68,12 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 		$codeFn = str_replace('function fn(', 'function func(', $code);
 		$codeFn = str_replace("\\n", "\n", $codeFn);
 		eval($codeFn);
-		$response->getBody()->write((string)func(0));
+		$guzzleClient = new GuzzleHttpClient();
+
+		$response->getBody()->write((string)func([
+			'data' => $params,
+			'deep' => new DeepClient(new DeepClientOptions($guzzleClient)),
+		]));
 
 	} else {
 		$logger->info('Failed to parse JSON.');
