@@ -6,7 +6,7 @@ function update_php_fpm_port {
     echo "Updating PHP-FPM port to ${port}"
     cat > /usr/local/etc/php-fpm.d/zz-docker.conf << EOF
 [www]
-listen = 0.0.0.0:${port}
+listen = 127.0.0.1:${port}
 EOF
 }
 
