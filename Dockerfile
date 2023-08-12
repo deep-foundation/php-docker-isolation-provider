@@ -31,8 +31,6 @@ COPY . /var/www/html
 
 RUN composer install --no-scripts --no-autoloader
 
-RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
-
 # Copy the custom www.conf into the image
 RUN rm -f /usr/local/etc/php-fpm.d/*
 

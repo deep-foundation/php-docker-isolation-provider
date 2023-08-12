@@ -14,8 +14,7 @@ EOF
 function restart_php_fpm {
     local port="$1"
     echo "Restarting PHP-FPM..."
-    # php-fpm -R
-    php-fpm -D
+    php-fpm -R
 }
 
 # Set default port if "PORT" environment variable is not set
