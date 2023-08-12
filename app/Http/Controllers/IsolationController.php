@@ -47,33 +47,14 @@ class IsolationController extends Controller
                 'data' => $params['data'],
                 'gql' => new QueryBuilder(),
             ];
-            $result = $this->executeHandler($params['code'], $args);
+            $codeFn = str_replace('function fn(', 'function func(', $params['code']);
+            $codeFn = str_replace("\\n", "\n", $codeFn);
+            eval($codeFn);
+            $result = func($args);
             return new JsonResponse(['resolved' => $result]);
         } catch (\Exception $e) {
             return new JsonResponse(['rejected' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    private function executeHandler(mixed $code, array $args): string
-    {
-        Log::channel('deep')->error(
-            json_encode([
-                'MESSAGE' => 'EXECUTE_HANDLER',
-                'CODE' => $code,
-                'ARGS' => $args
-            ])
-        );
-
-        $phpHandlerContext = [
-            'args' => $args
-        ];
-
-        $codeFn = str_replace('function fn(', 'function func(', $code);
-        $codeFn = str_replace("\\n", "\n", $codeFn);
-        $generatedCode = "$codeFn\n\$phpHandlerContext['result'] = func(\$phpHandlerContext['args']);";
-        $codeObject = \Opis\Closure\serialize(eval($generatedCode));
-        $phpHandlerContext = \Opis\Closure\unserialize($codeObject, ['phpHandlerContext' => &$phpHandlerContext]);
-        return $phpHandlerContext['result'];
     }
 
     private function makeDeepClient(string $jwt): string

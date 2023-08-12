@@ -25,7 +25,6 @@
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",
         "lotos2021/deepclient-test-php": "0.0.1",
-        "opis/closure": "^3.6",
         "webonyx/graphql-php": "^15.5"
     },
     "require-dev": {
