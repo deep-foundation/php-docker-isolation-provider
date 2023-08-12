@@ -4,8 +4,7 @@
 function update_nginx_port {
     local port="$1"
     echo "Updating nginx port to ${port}"
-    envsubst '$PORT' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp
-    mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
+    sed -i "s/\$PORT/${PORT}/g" /etc/nginx/nginx.conf
 }
 
 # Function to restart PHP-FPM
