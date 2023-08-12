@@ -18,6 +18,4 @@ Route::group(['middleware' => ['log.route:deep']], function () {
     Route::get('/healthz', [IsolationController::class, 'healthz']);
     Route::post('/init', [IsolationController::class, 'initialization']);
     Route::post('/call', [IsolationController::class, 'callProvider']);
-    Route::get('/init', [IsolationController::class, 'initialization']);
-    Route::get('/call', [IsolationController::class, 'callProvider']);
 });
