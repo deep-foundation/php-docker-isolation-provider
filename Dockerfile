@@ -1,6 +1,10 @@
 # Use a base PHP image
 FROM php:8.1-fpm-alpine
 
+# Install additional dependencies
+RUN apk update && apk add --no-cache \
+    nginx
+
 # Set environment variables
 ENV GQL_URN="localhost:3006/gql"
 ENV GQL_SSL=0
@@ -41,6 +45,9 @@ COPY start_server.sh /usr/local/bin/start_server.sh
 
 # Make the script executable
 RUN chmod +x /usr/local/bin/start_server.sh
+
+# Copy Nginx configuration file
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Set the script as the entry point for the container
 ENTRYPOINT ["/usr/local/bin/start_server.sh"]
