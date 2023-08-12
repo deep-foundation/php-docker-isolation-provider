@@ -1,5 +1,6 @@
 <?php
 echo 'test';
+/*
 // Create and configure Slim app
 $config = ['settings' => [
 	'addContentLengthHeader' => false,
@@ -13,6 +14,7 @@ $app->get('/hello/{name}', function ($request, $response, $args) {
 
 // Run app
 $app->run();
+*/
 
 /*
 require 'vendor/autoload.php';
