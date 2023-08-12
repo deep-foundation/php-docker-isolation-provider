@@ -11,7 +11,8 @@ function update_nginx_port {
 function restart_php_fpm {
     local port="$1"
     echo "Restarting PHP-FPM..."
-    php-fpm && nginx
+    nginx
+    php-fpm
 }
 
 # Set default port if "PORT" environment variable is not set

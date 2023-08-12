@@ -1,10 +1,10 @@
 <?php
-echo 'test';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-/*
+require 'vendor/autoload.php';
+
 // Create and configure Slim app
 $config = ['settings' => [
 	'addContentLengthHeader' => false,
@@ -18,7 +18,7 @@ $app->get('/hello/{name}', function ($request, $response, $args) {
 
 // Run app
 $app->run();
-*/
+
 
 /*
 require 'vendor/autoload.php';
