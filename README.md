@@ -7,7 +7,6 @@ sudo systemctl restart nginx
 
 
 ## Local restart docker
-
 ```bash
 docker build -t php-docker-isolation-provider .
 
@@ -16,14 +15,18 @@ docker run -d -p 39100:39100 -e PORT=39100 php-docker-isolation-provider
 docker ps
 ```
 
-## Stop docker
+## Check open ports
+```bash
+netstat -tuln
+curl http://localhost:39100
+```
 
+## Stop docker
 ```bash
 docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
 ```
 
 ## Start docker js
-
 ```bash
 docker pull deepf/js-docker-isolation-provider:main
 docker run -d -p 39090:39090 -e PORT=39090 deepf/js-docker-isolation-provider:main
