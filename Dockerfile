@@ -47,5 +47,8 @@ RUN mv /var/www/html/nginx.conf /etc/nginx/nginx.conf \
 # Make the script executable
 RUN chmod +x /usr/local/bin/start_server.sh
 
+# Create a directory for logs and set ownership
+RUN mkdir -p /var/www/logs && chown -R www-data:www-data /var/www/logs
+
 # Set the script as the entry point for the container
 ENTRYPOINT ["/usr/local/bin/start_server.sh"]

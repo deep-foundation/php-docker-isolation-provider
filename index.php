@@ -43,12 +43,12 @@ $app->post('/init', function (Request $request, Response $response) {
 });
 
 $app->post('/call', function (Request $request, Response $response)  use ($app) {
-	$logger = new Logger($loggerSettings['name']);
+	$logger = new Logger('app');
 
 	$processor = new UidProcessor();
 	$logger->pushProcessor($processor);
 
-	$handler = new StreamHandler($loggerSettings['path'], $loggerSettings['level']);
+	$handler = new StreamHandler(__DIR__ . '/../logs/app.log', Logger::DEBUG);
 	$logger->pushHandler($handler);
 
 	$logger->info('Hello from Slim!');
