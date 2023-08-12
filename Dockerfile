@@ -33,7 +33,7 @@ WORKDIR /var/www/html
 # Copy the source code into the container
 COPY . /var/www/html
 
-RUN composer install --no-scripts --no-autoloader
+RUN composer install
 
 # Copy the custom www.conf into the image
 RUN rm -f /usr/local/etc/php-fpm.d/*

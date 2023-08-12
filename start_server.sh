@@ -11,6 +11,8 @@ function update_nginx_port {
 function restart_php_fpm {
     local port="$1"
     echo "Restarting PHP-FPM..."
+    cd /var/www/html
+    cp .env.example .env
     nginx
     php-fpm
 }

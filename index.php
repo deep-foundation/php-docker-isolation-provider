@@ -5,37 +5,50 @@ error_reporting(E_ALL);
 
 require 'vendor/autoload.php';
 
+use Slim\Factory\AppFactory;
+use Slim\Factory\ServerRequestCreatorFactory;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+
+AppFactory::setSlimHttpDecoratorsAutomaticDetection(false);
+ServerRequestCreatorFactory::setSlimHttpDecoratorsAutomaticDetection(false);
+
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 $GQL_URN = getenv('GQL_URN') ?: 'localhost:3006/gql';
 $GQL_SSL = (bool) getenv('GQL_SSL') ?: 0;
 
-// Create and configure Slim app
-$config = ['settings' => [
-	'addContentLengthHeader' => false,
-]];
-$app = new \Slim\App($config);
+// Instantiate App
+$app = AppFactory::create();
+
+// Add error middleware
+$app->addErrorMiddleware(true, true, true);
 
 // Define app routes
-$app->get('/', function ($request, $response, $args) {
-	return $response->write("{}");
+$app->get('/', function (Request $request, Response $response) {
+	$response->getBody()->write('{}');
+	return $response;
 });
 
-$app->get('/healthz', function ($request, $response, $args) {
-	return $response->write("{}");
+$app->get('/healthz', function (Request $request, Response $response) {
+	$response->getBody()->write('{}');
+	return $response;
 });
 
-$app->post('/init', function ($request, $response, $args) {
-	return $response->write("{}");
+$app->post('/init', function (Request $request, Response $response) {
+	$response->getBody()->write('{}');
+	return $response;
 });
 
-$app->post('/call', function ($request, $response, $args) {
-	return $response->write("{}");
+$app->post('/call', function (Request $request, Response $response) {
+	$response->getBody()->write('{}');
+	return $response;
 });
 
-$app->post('/http-call', function ($request, $response, $args) {
-	return $response->write("{}");
+$app->post('/http-call', function (Request $request, Response $response) {
+	$response->getBody()->write('{}');
+	return $response;
 });
 
 // Run app
