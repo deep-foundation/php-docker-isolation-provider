@@ -14,7 +14,6 @@ class LogRoute
         $data = [
             'URI' => $request->getUri(),
             'METHOD' => $request->getMethod(),
-            'REQUEST_BODY' => $request->all(),
             'HEADERS' => collect($request->header())->transform(function ($item) {
                 return $item[0];
             })->toArray(),
