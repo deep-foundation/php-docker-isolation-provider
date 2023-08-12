@@ -51,8 +51,38 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 	$handler = new StreamHandler(__DIR__ . '/../logs/app.log', Logger::DEBUG);
 	$logger->pushHandler($handler);
 
-	$logger->info('Hello from Slim!');
+	$data = json_decode((string)$request->getBody(), true);
+
+	if ($data) {
+		$params = $data['params'] ?? [];
+		$code = $params['code'] ?? '';
+		$jwt = $params['jwt'] ?? '';
+
+		$logger->info( 'json_decode', [
+			'params' => $params,
+			'code' => $code,
+			'jwt' => $jwt,
+		]);
+
+	} else {
+		$logger->info('Failed to parse JSON.');
+	}
+
 	$response->getBody()->write('{}');
+
+	$logger->info('Incoming Request:', [
+		'method' => $request->getMethod(),
+		'uri' => (string)$request->getUri(),
+		'headers' => $request->getHeaders(),
+		'body' => (string)$request->getBody(),
+	]);
+
+	$logger->info('Outgoing Response:', [
+		'status' => $response->getStatusCode(),
+		'headers' => $response->getHeaders(),
+		'body' => (string)$response->getBody(),
+	]);
+
 	return $response;
 });
 
