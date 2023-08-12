@@ -15,14 +15,7 @@ function restart_php_fpm {
     local port="$1"
     echo "Restarting PHP-FPM..."
     # php-fpm -R
-    cd /var/www/html
-    composer install
-    cp .env.example .env
-    key=$(php -r "echo base64_encode(random_bytes(32));")
-    echo "APP_KEY=base64:$key" >> .env
-    echo "Application key set successfully."
-
-    php artisan serve --host=0.0.0.0 --port="${port}"
+    php-fpm -D
 }
 
 # Set default port if "PORT" environment variable is not set
