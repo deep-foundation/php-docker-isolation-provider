@@ -17,5 +17,5 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => ['log.route:deep']], function () {
     Route::get('/healthz', [IsolationController::class, 'healthz']);
     Route::post('/init', [IsolationController::class, 'initialization']);
-    Route::post('/call', [IsolationController::class, 'call']);
+    Route::post('/call', [IsolationController::class, 'callProvider']);
 });

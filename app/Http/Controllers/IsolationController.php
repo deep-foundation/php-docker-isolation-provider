@@ -30,7 +30,7 @@ class IsolationController extends Controller
         return new JsonResponse();
     }
 
-    public function call(Request $request)
+    public function callProvider(Request $request)
     {
         Log::channel('deep')->error(
             json_encode([
