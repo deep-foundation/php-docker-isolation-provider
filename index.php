@@ -5,6 +5,12 @@ error_reporting(E_ALL);
 
 require 'vendor/autoload.php';
 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+$GQL_URN = getenv('GQL_URN') ?: 'localhost:3006/gql';
+$GQL_SSL = (bool) getenv('GQL_SSL') ?: 0;
+
 // Create and configure Slim app
 $config = ['settings' => [
 	'addContentLengthHeader' => false,
@@ -12,8 +18,24 @@ $config = ['settings' => [
 $app = new \Slim\App($config);
 
 // Define app routes
-$app->get('/hello/{name}', function ($request, $response, $args) {
-	return $response->write("Hello " . $args['name']);
+$app->get('/', function ($request, $response, $args) {
+	return $response->write("{}");
+});
+
+$app->get('/healthz', function ($request, $response, $args) {
+	return $response->write("{}");
+});
+
+$app->post('/init', function ($request, $response, $args) {
+	return $response->write("{}");
+});
+
+$app->post('/call', function ($request, $response, $args) {
+	return $response->write("{}");
+});
+
+$app->post('/http-call', function ($request, $response, $args) {
+	return $response->write("{}");
 });
 
 // Run app

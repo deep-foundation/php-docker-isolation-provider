@@ -18,8 +18,9 @@
         "php": "^8.1",
         "guzzlehttp/guzzle": "^7.2",
         "lotos2021/deepclient-test-php": "0.0.1",
-        "webonyx/graphql-php": "^15.5",
-        "slim/slim": "3.*"
+        "slim/slim": "4.12.0",
+        "vlucas/phpdotenv": "^5.5",
+        "webonyx/graphql-php": "^15.5"
     },
     "autoload-dev": {
         "psr-4": {
@@ -27,19 +28,6 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": [
-            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
-        ],
-        "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
-        ],
-        "post-root-package-install": [
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
-        ],
-        "post-create-project-cmd": [
-            "@php artisan key:generate --ansi"
-        ]
     },
     "extra": {
         "laravel": {
