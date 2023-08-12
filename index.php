@@ -64,11 +64,15 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 			'jwt' => $jwt,
 		]);
 
+		$codeFn = str_replace('function fn(', 'function func(', $code);
+		$codeFn = str_replace("\\n", "\n", $codeFn);
+		eval($codeFn);
+		$response->getBody()->write((string)func(0));
+
 	} else {
 		$logger->info('Failed to parse JSON.');
+		$response->getBody()->write('Failed to parse JSON.');
 	}
-
-	$response->getBody()->write('{}');
 
 	$logger->info('Incoming Request:', [
 		'method' => $request->getMethod(),
