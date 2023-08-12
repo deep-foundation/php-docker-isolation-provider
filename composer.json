@@ -18,6 +18,7 @@
         "php": "^8.1",
         "guzzlehttp/guzzle": "^7.2",
         "lotos2021/deepclient-test-php": "0.0.1",
+        "monolog/monolog": "^3.4",
         "slim/slim": "4.12.0",
         "vlucas/phpdotenv": "^5.5",
         "webonyx/graphql-php": "^15.5"

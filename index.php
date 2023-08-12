@@ -6,18 +6,19 @@ error_reporting(E_ALL);
 require 'vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
-use Slim\Factory\ServerRequestCreatorFactory;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
-AppFactory::setSlimHttpDecoratorsAutomaticDetection(false);
-ServerRequestCreatorFactory::setSlimHttpDecoratorsAutomaticDetection(false);
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 $GQL_URN = getenv('GQL_URN') ?: 'localhost:3006/gql';
 $GQL_SSL = (bool) getenv('GQL_SSL') ?: 0;
+
+$logger = new Logger('app');
+$logger->pushHandler(new StreamHandler('logs/app.log', Logger::DEBUG));
 
 // Instantiate App
 $app = AppFactory::create();
@@ -41,7 +42,8 @@ $app->post('/init', function (Request $request, Response $response) {
 	return $response;
 });
 
-$app->post('/call', function (Request $request, Response $response) {
+$app->post('/call', function (Request $request, Response $response) use ($logger) {
+	$logger->info($request->getParsedBody());
 	$response->getBody()->write('{}');
 	return $response;
 });
