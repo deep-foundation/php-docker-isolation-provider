@@ -38,14 +38,14 @@ RUN composer install --no-scripts --no-autoloader
 # Copy the custom www.conf into the image
 RUN rm -f /usr/local/etc/php-fpm.d/*
 
-# Make the script executable
-RUN chmod +x /usr/local/bin/start_server.sh
-
 # Copy the start_server.sh script into the image
 # Copy Nginx configuration file
 RUN mv /var/www/html/nginx.conf /etc/nginx/nginx.conf.new \
     && mv /var/www/html/docker.conf /usr/local/etc/php-fpm.d/docker.conf \
     && mv /var/www/html/start_server.sh /usr/local/bin/start_server.sh
+
+# Make the script executable
+RUN chmod +x /usr/local/bin/start_server.sh
 
 # Set the script as the entry point for the container
 ENTRYPOINT ["/usr/local/bin/start_server.sh"]
