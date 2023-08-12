@@ -5,20 +5,20 @@ error_reporting(E_ALL);
 
 require 'vendor/autoload.php';
 
+use Monolog\Handler\StreamHandler;
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
+use Monolog\Processor\UidProcessor;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 $GQL_URN = getenv('GQL_URN') ?: 'localhost:3006/gql';
 $GQL_SSL = (bool) getenv('GQL_SSL') ?: 0;
-
-$logger = new Logger('app');
-$logger->pushHandler(new StreamHandler('logs/app.log', Logger::DEBUG));
 
 // Instantiate App
 $app = AppFactory::create();
@@ -42,8 +42,16 @@ $app->post('/init', function (Request $request, Response $response) {
 	return $response;
 });
 
-$app->post('/call', function (Request $request, Response $response) use ($logger) {
-	$logger->info($request->getParsedBody());
+$app->post('/call', function (Request $request, Response $response)  use ($app) {
+	$logger = new Logger($loggerSettings['name']);
+
+	$processor = new UidProcessor();
+	$logger->pushProcessor($processor);
+
+	$handler = new StreamHandler($loggerSettings['path'], $loggerSettings['level']);
+	$logger->pushHandler($handler);
+
+	$logger->info('Hello from Slim!');
 	$response->getBody()->write('{}');
 	return $response;
 });
