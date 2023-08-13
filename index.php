@@ -5,21 +5,46 @@ error_reporting(E_ALL);
 
 require 'vendor/autoload.php';
 
+use DeepFoundation\DeepClient\DeepClient;
+use DeepFoundation\DeepClient\DeepClientOptions;
 use Monolog\Handler\StreamHandler;
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
-use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client as GuzzleHttpClient;
+
+use GraphQL\Executor\Executor;
+use GraphQL\GraphQL;
+use GraphQL\Type\Schema;
+use GraphQL\Utils\BuildSchema;
+use GraphQL\Utils\AST;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\RequestInterface;
+use Webonyx\GraphQL\Client;
+use Webonyx\GraphQL\Executor\ExecutionResult;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-$GQL_URN = getenv('GQL_URN') ?: 'localhost:3006/gql';
-$GQL_SSL = (bool) getenv('GQL_SSL') ?: 0;
+function makeDeepClient($token) {
+	if (!$token) {
+		throw new InvalidArgumentException("No token provided");
+	}
+
+	$GQL_URN = getenv('GQL_URN') ?: 'localhost:3006/gql';
+	$GQL_SSL = (bool) getenv('GQL_SSL') ?: 0;
+
+	$url = ($GQL_SSL) ? "https://$GQL_URN" : "http://$GQL_URN";
+	$httpClient = new GuzzleHttpClient(['base_uri' => $url]);
+
+	$client = Client::fromSchema(Schema::create(
+		BuildSchema::build(file_get_contents('schema.graphql'))
+	));
+
+	return $client->withQueryOption('headers', ['Authorization' => "Bearer $token"]);
+}
 
 // Instantiate App
 $app = AppFactory::create();
@@ -68,11 +93,10 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 		$codeFn = str_replace('function fn(', 'function func(', $code);
 		$codeFn = str_replace("\\n", "\n", $codeFn);
 		eval($codeFn);
-		$guzzleClient = new GuzzleHttpClient();
 
 		$response->getBody()->write((string)func([
 			'data' => $params,
-			'deep' => new DeepClient(new DeepClientOptions($guzzleClient)),
+			'deep' => makeDeepClient($jwt),
 		]));
 
 	} else {
