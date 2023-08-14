@@ -5,46 +5,15 @@ error_reporting(E_ALL);
 
 require 'vendor/autoload.php';
 
-use DeepFoundation\DeepClient\DeepClient;
-use DeepFoundation\DeepClient\DeepClientOptions;
 use Monolog\Handler\StreamHandler;
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
-use GuzzleHttp\Client as GuzzleHttpClient;
-
-use GraphQL\Executor\Executor;
-use GraphQL\GraphQL;
-use GraphQL\Type\Schema;
-use GraphQL\Utils\BuildSchema;
-use GraphQL\Utils\AST;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\RequestInterface;
-use Webonyx\GraphQL\Client;
-use Webonyx\GraphQL\Executor\ExecutionResult;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
-
-function makeDeepClient($token) {
-	if (!$token) {
-		throw new InvalidArgumentException("No token provided");
-	}
-
-	$GQL_URN = getenv('GQL_URN') ?: 'localhost:3006/gql';
-	$GQL_SSL = (bool) getenv('GQL_SSL') ?: 0;
-
-	$url = ($GQL_SSL) ? "https://$GQL_URN" : "http://$GQL_URN";
-	$httpClient = new GuzzleHttpClient(['base_uri' => $url]);
-
-	$client = Client::fromSchema(Schema::create(
-		BuildSchema::build(file_get_contents('schema.graphql'))
-	));
-
-	return $client->withQueryOption('headers', ['Authorization' => "Bearer $token"]);
-}
 
 // Instantiate App
 $app = AppFactory::create();
@@ -96,7 +65,7 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 
 		$response->getBody()->write((string)func([
 			'data' => $params,
-			'deep' => makeDeepClient($jwt),
+			'deep' => make_deep_client($jwt, 'http://localhost:3006/gql'),
 		]));
 
 	} else {
@@ -127,69 +96,3 @@ $app->post('/http-call', function (Request $request, Response $response) {
 
 // Run app
 $app->run();
-
-
-/*
-require 'vendor/autoload.php';
-
-use GraphQL\Client;
-use GraphQL\Executor\ExecutionResult;
-use GraphQL\QueryBuilder\QueryBuilder;
-use GraphQL\Transport\GuzzleHttpGQLHTTPTransport;
-use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-
-$app = new \Silex\Application();
-
-$GQL_URN = getenv("GQL_URN") ?: "localhost:3006/gql";
-$GQL_SSL = getenv("GQL_SSL") ?: 0;
-
-function execute_handler($code, $args)
-{
-	$python_handler_context = ['args' => $args];
-	$generated_code = "$code\npython_handler_context['result'] = fn(python_handler_context['args']);";
-	eval($generated_code);
-	$result = $python_handler_context['result'];
-	return $result;
-}
-
-function make_deep_client($token)
-{
-	if (empty($token)) {
-		throw new \InvalidArgumentException("No token provided");
-	}
-	$url = $GQL_SSL ? "https://$GQL_URN" : "http://$GQL_URN";
-	$transport = new GuzzleHttpGQLHTTPTransport($url, ['headers' => ['Authorization' => $token]]);
-	$deep_client = new Client($transport, null, null, null, true);
-	return $deep_client;
-}
-
-$app->get('/healthz', function () {
-	return new JsonResponse();
-});
-
-$app->post('/init', function () {
-	return new JsonResponse();
-});
-
-$app->post('/call', function (Request $request) use ($app) {
-	try {
-		$body = json_decode($request->getContent(), true);
-		$params = $body['params'];
-		$args = [
-			'deep' => make_deep_client($params['jwt']),
-			'data' => $params['data'],
-			'gql' => new QueryBuilder(),
-		];
-		$result = execute_handler($params['code'], $args);
-		return new JsonResponse(['resolved' => $result]);
-	} catch (\Exception $e) {
-		return new JsonResponse(['rejected' => $e->getTraceAsString()], Response::HTTP_INTERNAL_SERVER_ERROR);
-	}
-});
-
-$app->run();
-*/
