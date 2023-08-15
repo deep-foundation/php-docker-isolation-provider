@@ -4,7 +4,7 @@ FROM php:8.1-fpm-alpine
 # Install additional dependencies
 RUN apk update && apk add --no-cache \
     nginx \
-    python3 py3-pip
+    python3 py3-pip python3-dev
 
 
 RUN pip3 install aiohttp==3.8.4 \
@@ -18,6 +18,7 @@ RUN pip3 install aiohttp==3.8.4 \
                  jmespath==1.0.1 \
                  multidict==6.0.4 \
                  websockets==10.4 \
+                 deepclient==1.0.1 \
                  yarl==1.9.2
 
 # Set environment variables

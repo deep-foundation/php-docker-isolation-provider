@@ -65,7 +65,7 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 
 		$response->getBody()->write((string)func([
 			'data' => $params,
-			'deep' => make_deep_client($jwt, 'http://localhost:3006/gql'),
+			'deep' => make_deep_client($jwt, 'http://localhost:3006/gql').select(1),
 		]));
 
 	} else {
