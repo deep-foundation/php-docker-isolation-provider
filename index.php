@@ -57,22 +57,15 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 			$jwt = $params['jwt'] ?? '';
 			$url = sprintf("http://%s", getenv('GQL_URN') ?: '192.168.135:3006/gql');
 
-			$logger->info( 'json_decode', [
-				'jwt' => $jwt,
-				'GQL_URN' => (string)$url
-			]);
-
 			$codeFn = str_replace('function fn(', 'function func(', $code);
 			$codeFn = str_replace("\\n", "\n", $codeFn);
 
 			eval($codeFn);
 
-			$response->getBody()->write(func([
-				'data' => $params,
-				'deep' => new DeepClientPhpWrapper($jwt, $url)
-			]));
+			$response->getBody()->write(func($params,new DeepClientPhpWrapper($jwt, $url)));
 		} catch (Exception $e) {
 			$response->getBody()->write("An error occurred: ".$e->getMessage());
+			$logger->info("An error occurred: ".$e->getMessage());
 		}
 	} else {
 		$logger->info('Failed to parse JSON.');
