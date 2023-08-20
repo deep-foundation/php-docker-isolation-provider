@@ -21,7 +21,22 @@ $dotenv->load();
 $app = AppFactory::create();
 
 // Add error middleware
-$app->addErrorMiddleware(true, true, true);
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+
+$logger = new Logger('app');
+
+$processor = new UidProcessor();
+$logger->pushProcessor($processor);
+
+$handler = new StreamHandler(__DIR__ . '/../logs/app.log', Logger::DEBUG);
+$logger->pushHandler($handler);
+
+$errorMiddleware->setDefaultErrorHandler(function (Request $request, Throwable $exception, bool $displayErrorDetails)  use ($app, $logger) {
+	$response = $app->getResponseFactory()->createResponse();
+	$logger->info("An error occurred: ".$exception->getMessage());
+	$response->getBody()->write("{Error}");
+	return $response;
+});
 
 // Define app routes
 $app->get('/', function (Request $request, Response $response) {
@@ -39,15 +54,7 @@ $app->post('/init', function (Request $request, Response $response) {
 	return $response;
 });
 
-$app->post('/call', function (Request $request, Response $response)  use ($app) {
-	$logger = new Logger('app');
-
-	$processor = new UidProcessor();
-	$logger->pushProcessor($processor);
-
-	$handler = new StreamHandler(__DIR__ . '/../logs/app.log', Logger::DEBUG);
-	$logger->pushHandler($handler);
-
+$app->post('/call', function (Request $request, Response $response) use ($app, $logger) {
 	$data = json_decode((string)$request->getBody(), true);
 
 	if ($data) {
@@ -62,10 +69,12 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 
 			eval($codeFn);
 
-			$response->getBody()->write(func($params,new DeepClientPhpWrapper($jwt, $url)));
+			$result = (string)func($params,new DeepClientPhpWrapper($jwt, $url));
+
+			$response->getBody()->write($result);
 		} catch (Exception $e) {
-			$response->getBody()->write("An error occurred: ".$e->getMessage());
 			$logger->info("An error occurred: ".$e->getMessage());
+			$response->getBody()->write("An error occurred: ".$e->getMessage());
 		}
 	} else {
 		$logger->info('Failed to parse JSON.');
