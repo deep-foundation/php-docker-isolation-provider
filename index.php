@@ -34,7 +34,7 @@ $logger->pushHandler($handler);
 $errorMiddleware->setDefaultErrorHandler(function (Request $request, Throwable $exception, bool $displayErrorDetails)  use ($app, $logger) {
 	$response = $app->getResponseFactory()->createResponse();
 	$logger->info("An error occurred: ".$exception->getMessage());
-	$response->getBody()->write("{Error}");
+	$response->getBody()->write($exception->getMessage());
 	return $response;
 });
 
@@ -69,7 +69,10 @@ $app->post('/call', function (Request $request, Response $response) use ($app, $
 
 			eval($codeFn);
 
-			$result = (string)func($params,new DeepClientPhpWrapper($jwt, $url));
+			$result = var_export(func(
+					$data = $params,
+					$deep = new DeepClientPhpWrapper($jwt, $url)
+				), true);
 
 			$response->getBody()->write($result);
 		} catch (Exception $e) {
