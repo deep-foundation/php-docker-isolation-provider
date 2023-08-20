@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/bash
 
 # Function to update nginx configuration with the specified port
 function update_nginx_port {

@@ -61,12 +61,13 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 
 		$codeFn = str_replace('function fn(', 'function func(', $code);
 		$codeFn = str_replace("\\n", "\n", $codeFn);
+
 		eval($codeFn);
 
 		$response->getBody()->write((string)func([
 			'data' => $params,
-			'deep' => make_deep_client($jwt, 'http://localhost:3006/gql').select(1),
-		]));
+			'deep' => new DeepClientPhpWrapper($jwt, 'http://localhost:3006/gql')
+		]);
 
 	} else {
 		$logger->info('Failed to parse JSON.');
