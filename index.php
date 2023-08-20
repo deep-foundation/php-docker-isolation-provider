@@ -66,7 +66,7 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 
 		$response->getBody()->write((string)func([
 			'data' => $params,
-			'deep' => new DeepClientPhpWrapper($jwt, $_ENV['GQL_URN'] ?? 'http://localhost:3006/gql')
+			'deep' => new DeepClientPhpWrapper($jwt, 'http://'.$_ENV['GQL_URN'] ?? 'http://localhost:3006/gql')
 		]));
 
 	} else {
