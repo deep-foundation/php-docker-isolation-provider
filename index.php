@@ -1,7 +1,9 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(0);
+
+extension_loaded('deep_client_php_extension') or dl('deep_client_php_extension.so');
 
 require 'vendor/autoload.php';
 
@@ -57,6 +59,7 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 			'params' => $params,
 			'code' => $code,
 			'jwt' => $jwt,
+			'GQL_URN' => $_ENV['GQL_URN']
 		]);
 
 		$codeFn = str_replace('function fn(', 'function func(', $code);
@@ -66,7 +69,7 @@ $app->post('/call', function (Request $request, Response $response)  use ($app) 
 
 		$response->getBody()->write((string)func([
 			'data' => $params,
-			'deep' => new DeepClientPhpWrapper($jwt, 'http://'.$_ENV['GQL_URN'] ?? 'http://localhost:3006/gql')
+			'deep' => new DeepClientPhpWrapper($jwt, 'http://'.($_ENV['GQL_URN'] ?? 'localhost:3006/gql'))
 		]));
 
 	} else {
