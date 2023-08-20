@@ -9,7 +9,7 @@ sudo systemctl restart nginx
 ## Local restart docker
 ```bash
 docker build -t php-docker-isolation-provider .
-docker run -d -p 39100:39100 -e PORT=39100 php-docker-isolation-provider
+docker run -d -p 39103:39103 -e PORT=39103 php-docker-isolation-provider
 docker ps
 ```
 

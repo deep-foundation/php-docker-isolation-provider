@@ -18,7 +18,6 @@ def make_deep_client(token, url):
         client = Client(transport=transport, fetch_schema_from_transport=True)
         options = DeepClientOptions(gql_client=client)
         global_deep_client = DeepClient(options)
-        print("recreate")
 
     return global_deep_client
 
