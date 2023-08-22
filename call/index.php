@@ -5,7 +5,7 @@ error_reporting(-1);
 
 extension_loaded('deep_client_php_extension') or dl('deep_client_php_extension.so');
 
-require '/../vendor/autoload.php';
+require '/var/www/html/vendor/autoload.php';
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -16,7 +16,7 @@ $logger = new Logger('app');
 $processor = new UidProcessor();
 $logger->pushProcessor($processor);
 
-$handler = new StreamHandler(__DIR__ . '/../../logs/app.log', Logger::DEBUG);
+$handler = new StreamHandler('/var/www/logs/app.log', Logger::DEBUG);
 $logger->pushHandler($handler);
 
 class CodeExecutor {
@@ -56,41 +56,41 @@ function parseJsonRequest($request) {
     return $data;
 }
 
-// Process /call endpoint
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] === 'application/json') {
-    try {
-        $requestBody = file_get_contents('php://input');
-        $data = parseJsonRequest($requestBody);
-        if ($data) {
-            $params = $data['params'] ?? [];
-            $code = $params['code'] ?? '';
-            $jwt = $params['jwt'] ?? '';
-            $url = sprintf("http://%s", getenv('GQL_URN') ?: '192.168.0.135:3006/gql');
 
-            $codeFn = str_replace('function fn(', 'function func(', $code);
-            $codeFn = str_replace("\\n", "\n", $codeFn);
+try {
+    $requestBody = file_get_contents('php://input');
+    print_r($_ENV);
+    /*$data = parseJsonRequest($requestBody);
+    if ($data) {
+        $params = $data['params'] ?? [];
+        $code = $params['code'] ?? '';
+        $jwt = $params['jwt'] ?? '';
+        $url = sprintf("http://%s", getenv('GQL_URN') ?: '192.168.0.135:3006/gql');
 
-            $executor = new CodeExecutor();
-            $deepClient = new DeepClientPhpWrapper($jwt, $url);
+        echo $url;
 
-            try {
-                $resultFromFunction = $executor->execute($codeFn, $params['data'], $deepClient);
-                $result = $resultFromFunction;
-            } catch (ErrorException $e) {
-                $logger->info("Error: ".$e->getMessage());
-                $result = "Error: " . $e->getMessage();
-            }
+        $codeFn = str_replace('function fn(', 'function func(', $code);
+        $codeFn = str_replace("\\n", "\n", $codeFn);
 
-            echo $result;
-        } else {
-            $logger->info('Failed to parse JSON.');
-            echo 'Failed to parse JSON.';
+        $executor = new CodeExecutor();
+        $deepClient = new DeepClientPhpWrapper($jwt, $url);
+
+        try {
+            $resultFromFunction = $executor->execute($codeFn, $params['data'], $deepClient);
+            $result = $resultFromFunction;
+        } catch (ErrorException $e) {
+            $logger->info("Error: ".$e->getMessage());
+            $result = "Error: " . $e->getMessage();
         }
-    } catch (Exception $e) {
-        $logger->info("An error occurred: ".$e->getMessage());
-        echo "An error occurred: ".$e->getMessage();
-    }
-} else {
-    echo '{}'; // Default response for other cases
+
+        //echo $result;
+    } else {
+        $logger->info('Failed to parse JSON.');
+        echo 'Failed to parse JSON.';
+    }*/
+} catch (Exception $e) {
+    $logger->info("An error occurred: ".$e->getMessage());
+    echo "An error occurred: ".$e->getMessage();
 }
+
 ?>

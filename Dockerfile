@@ -39,7 +39,7 @@ COPY --from=php-image /usr/lib/x86_64-linux-gnu/libargon2.so.1 \
         /usr/lib/x86_64-linux-gnu/
 
 # Set environment variables
-ENV GQL_URN="localhost:3006/gql"
+ENV GQL_URN="192.168.0.135:3006/gql"
 ENV GQL_SSL=0
 
 WORKDIR /var/www/html
