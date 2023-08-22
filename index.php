@@ -1,9 +1,29 @@
 <?php
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
-error_reporting(0);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(-1);
 
 extension_loaded('deep_client_php_extension') or dl('deep_client_php_extension.so');
+
+class CodeExecutor {
+    public function execute($functionCode, $data, $deep) {
+        $codeFn = "
+        $functionCode
+        
+        print_r(func(\$data, \$deep));
+        ";
+        ob_start();
+        set_error_handler([$this, 'errorHandler']);
+        eval($codeFn);
+        restore_error_handler();
+        $output = ob_get_clean();
+        return $output;
+    }
+
+    public function errorHandler($errno, $errstr, $errfile, $errline) {
+        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+    }
+}
 
 require 'vendor/autoload.php';
 
@@ -67,12 +87,10 @@ $app->post('/call', function (Request $request, Response $response) use ($app, $
 			$codeFn = str_replace('function fn(', 'function func(', $code);
 			$codeFn = str_replace("\\n", "\n", $codeFn);
 
-			eval($codeFn);
+			$executor = new CodeExecutor();
 
-			$result = var_export(func(
-					$data = $params,
-					$deep = new DeepClientPhpWrapper($jwt, $url)
-				), true);
+			$result = $executor->execute($codeFn, $params,
+				new DeepClientPhpWrapper($jwt, $url));
 
 			$response->getBody()->write($result);
 		} catch (Exception $e) {
