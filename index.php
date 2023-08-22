@@ -56,7 +56,7 @@ class CodeExecutor {
 $errorMiddleware->setDefaultErrorHandler(function (Request $request, Throwable $exception, bool $displayErrorDetails)  use ($app, $logger) {
 	$response = $app->getResponseFactory()->createResponse();
 	$logger->info("An error occurred: ".$exception->getMessage());
-	$response->getBody()->write($exception->getMessage());
+	$response->getBody()->write(json_encode($exception->getMessage()));
 	return $response;
 });
 
@@ -100,16 +100,16 @@ $app->post('/call', function (Request $request, Response $response) use ($app, $
 				$result = "Error: " . $e->getMessage();
 			}
 
-			$response->getBody()->write($result);
+			$response->getBody()->write(json_encode($result));
 		} catch (Exception $e) {
 			$logger->info("An error occurred: ".$e->getMessage());
-			$response->getBody()->write("An error occurred: ".$e->getMessage());
+			$response->getBody()->write(json_encode("An error occurred: ".$e->getMessage()));
 		}
 	} else {
 		$logger->info('Failed to parse JSON.');
-		$response->getBody()->write('Failed to parse JSON.');
+		$response->getBody()->write(json_encode('Failed to parse JSON.'));
 	}
-	return $response;
+	return $response->withHeader('Content-Type', 'application/json')->withStatus(200);;
 });
 
 $app->post('/http-call', function (Request $request, Response $response) {
