@@ -58,7 +58,9 @@ RUN mv /var/www/html/nginx.conf /etc/nginx/nginx.conf \
     && chmod +x /usr/local/bin/start_server.sh \
     && chmod +x /usr/local/bin/compose \
     && echo "extension=deep_client_php_extension.so" > /usr/local/etc/php/conf.d/deep_client_php_extension.ini \
-    && mkdir -p /var/www/logs && chown -R www-data:www-data /var/www/logs
+    && mkdir -p /var/www/logs && chown -R www-data:www-data /var/www/logs \
+    && touch /run/php/php7.4-fpm.sock \
+    && chown www-data:www-data /run/php/php7.4-fpm.sock
 
 RUN /usr/local/bin/compose install
 
