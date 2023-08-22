@@ -3,11 +3,11 @@
 extension_loaded('deep_client_php_extension') or dl('deep_client_php_extension.so');
 
 class CodeExecutor {
-    public function execute($functionCode, $deepClient, $param1Value, $param2Value) {
+    public function execute($functionCode, $data, $deep) {
         $codeFn = "
         $functionCode
         
-        print_r(func(\$deepClient, \$param1Value, \$param2Value));
+        print_r(func(\$data, \$deep));
         ";
         ob_start();
         set_error_handler([$this, 'errorHandler']);
@@ -29,18 +29,19 @@ $deepClient = new DeepClientPhpWrapper(
 );
 
 $functionCode = '
-    function func($instance, $param1, $param2) {
-        return $instance->select(90);
+    function func($data, $deep) {
+        return $deep->select(90);
     };';
 
-$param1Value = 5;
-$param2Value = 7;
+$data = [];
+
 
 try {
-    $resultFromFunction = $executor->execute($functionCode, $deepClient, $param1Value, $param2Value);
+    $resultFromFunction = $executor->execute($functionCode, $data, $deepClient);
     echo "Result from CodeExecutor: " . $resultFromFunction;
 } catch (ErrorException $e) {
     echo "Error: " . $e->getMessage();
 }
+
 
 

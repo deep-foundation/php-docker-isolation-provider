@@ -5,26 +5,6 @@ error_reporting(-1);
 
 extension_loaded('deep_client_php_extension') or dl('deep_client_php_extension.so');
 
-class CodeExecutor {
-    public function execute($functionCode, $data, $deep) {
-        $codeFn = "
-        $functionCode
-        
-        print_r(func(\$data, \$deep));
-        ";
-        ob_start();
-        set_error_handler([$this, 'errorHandler']);
-        eval($codeFn);
-        restore_error_handler();
-        $output = ob_get_clean();
-        return $output;
-    }
-
-    public function errorHandler($errno, $errstr, $errfile, $errline) {
-        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-    }
-}
-
 require 'vendor/autoload.php';
 
 use Monolog\Handler\StreamHandler;
@@ -50,6 +30,28 @@ $logger->pushProcessor($processor);
 
 $handler = new StreamHandler(__DIR__ . '/../logs/app.log', Logger::DEBUG);
 $logger->pushHandler($handler);
+
+class CodeExecutor {
+    public function execute($functionCode, $data, $deep) {
+        $codeFn = "
+        $functionCode
+        
+        print_r(func(\$data, \$deep));
+        ";
+        ob_start();
+        set_error_handler([$this, 'errorHandler']);
+        eval($codeFn);
+        restore_error_handler();
+        $output = ob_get_clean();
+        return $output;
+    }
+
+    public function errorHandler($errno, $errstr, $errfile, $errline) {
+		global $logger;
+		$logger->info("Error: ".$errstr);
+        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+    }
+}
 
 $errorMiddleware->setDefaultErrorHandler(function (Request $request, Throwable $exception, bool $displayErrorDetails)  use ($app, $logger) {
 	$response = $app->getResponseFactory()->createResponse();
@@ -82,15 +84,21 @@ $app->post('/call', function (Request $request, Response $response) use ($app, $
 			$params = $data['params'] ?? [];
 			$code = $params['code'] ?? '';
 			$jwt = $params['jwt'] ?? '';
-			$url = sprintf("http://%s", getenv('GQL_URN') ?: '192.168.135:3006/gql');
+			$url = sprintf("http://%s", getenv('GQL_URN') ?: '192.168.0.135:3006/gql');
 
 			$codeFn = str_replace('function fn(', 'function func(', $code);
 			$codeFn = str_replace("\\n", "\n", $codeFn);
 
 			$executor = new CodeExecutor();
+			$deepClient = new DeepClientPhpWrapper($jwt, $url);
 
-			$result = $executor->execute($codeFn, $params,
-				new DeepClientPhpWrapper($jwt, $url));
+			try {
+				$resultFromFunction = $executor->execute($codeFn, $params['data'], $deepClient);
+				$result = $resultFromFunction;
+			} catch (ErrorException $e) {
+				$logger->info("Error: ".$e->getMessage());
+				$result = "Error: " . $e->getMessage();
+			}
 
 			$response->getBody()->write($result);
 		} catch (Exception $e) {
