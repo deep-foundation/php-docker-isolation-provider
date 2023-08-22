@@ -36,7 +36,7 @@ class CodeExecutor {
         $codeFn = "
         $functionCode
         
-        print_r(func(\$data, \$deep));
+        print_r(func(['data' => \$data, 'deep' => \$deep]));
         ";
         ob_start();
         set_error_handler([$this, 'errorHandler']);
