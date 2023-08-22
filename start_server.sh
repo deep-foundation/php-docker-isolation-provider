@@ -15,7 +15,6 @@ function restart_php_fpm {
     cp .env.example .env
     nginx
     php-fpm
-    chmod 777 /run/php7.4-fpm.sock
 }
 
 # Set default port if "PORT" environment variable is not set
