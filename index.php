@@ -53,30 +53,7 @@ class CodeExecutor {
     }
 }
 
-$errorMiddleware->setDefaultErrorHandler(function (Request $request, Throwable $exception, bool $displayErrorDetails)  use ($app, $logger) {
-	$response = $app->getResponseFactory()->createResponse();
-	$logger->info("An error occurred: ".$exception->getMessage());
-	$response->getBody()->write(json_encode(['rejected' => $exception->getMessage()]));
-	return $response;
-});
-
-// Define app routes
-$app->get('/', function (Request $request, Response $response) {
-	$response->getBody()->write('{}');
-	return $response;
-});
-
-$app->get('/healthz', function (Request $request, Response $response) {
-	$response->getBody()->write('{}');
-	return $response;
-});
-
-$app->post('/init', function (Request $request, Response $response) {
-	$response->getBody()->write('{}');
-	return $response;
-});
-
-$app->post('/call', function (Request $request, Response $response) use ($app, $logger) {
+function callExecutor(Request $request, Response $response) use ($app, $logger) {
 	$data = json_decode((string)$request->getBody(), true);
 
 	if ($data) {
@@ -110,12 +87,34 @@ $app->post('/call', function (Request $request, Response $response) use ($app, $
 		$response->getBody()->write(json_encode(['rejected' => 'Failed to parse JSON.']));
 	}
 	return $response->withHeader('Content-Type', 'application/json')->withStatus(200);;
+}
+
+$errorMiddleware->setDefaultErrorHandler(function (Request $request, Throwable $exception, bool $displayErrorDetails)  use ($app, $logger) {
+	$response = $app->getResponseFactory()->createResponse();
+	$logger->info("An error occurred: ".$exception->getMessage());
+	$response->getBody()->write(json_encode(['rejected' => $exception->getMessage()]));
+	return $response;
 });
 
-$app->post('/http-call', function (Request $request, Response $response) {
+// Define app routes
+$app->get('/', function (Request $request, Response $response) {
 	$response->getBody()->write('{}');
 	return $response;
 });
+
+$app->get('/healthz', function (Request $request, Response $response) {
+	$response->getBody()->write('{}');
+	return $response;
+});
+
+$app->post('/init', function (Request $request, Response $response) {
+	$response->getBody()->write('{}');
+	return $response;
+});
+
+$app->post('/call', callExecutor);
+
+$app->post('/http-call', callExecutor);
 
 // Run app
 $app->run();
