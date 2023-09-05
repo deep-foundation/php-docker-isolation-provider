@@ -53,33 +53,41 @@ class CodeExecutor {
     }
 }
 
-function handleRequest(Request $request, Response $response) {
+function handleRequestExecutor(Request $request, Response $response) {
     global $logger;
-    $data = json_decode((string)$request->getBody(), true);
+	$data = json_decode((string)$request->getBody(), true);
 
-    if (!$data) {
-        $logger->info('Failed to parse JSON.');
-        return $response->withJson(['rejected' => 'Failed to parse JSON.'], 400);
-    }
+	if ($data) {
+		try {
+			$params = $data['params'] ?? [];
+			$code = $params['code'] ?? '';
+			$jwt = $params['jwt'] ?? '';
+			$url = sprintf("http://%s", getenv('GQL_URN') ?: '192.168.0.135:3006/gql');
 
-    try {
-        $params = $data['params'] ?? [];
-        $code = $params['code'] ?? '';
-        $jwt = $params['jwt'] ?? '';
-        $url = sprintf("http://%s", getenv('GQL_URN') ?: '192.168.0.135:3006/gql');
+			$codeFn = str_replace('function fn(', 'function func(', $code);
+			$codeFn = str_replace("\\n", "\n", $codeFn);
 
-        $codeFn = str_replace('function fn(', 'function func(', $code);
-        $codeFn = str_replace("\\n", "\n", $codeFn);
+			$executor = new CodeExecutor();
+			$deepClient = new DeepClientPhpWrapper($jwt, $url);
 
-        $executor = new CodeExecutor($logger);
-        $deepClient = new DeepClientPhpWrapper($jwt, $url);
+			try {
+				$resultFromFunction = $executor->execute($codeFn, $params['data'], $deepClient);
+				$result = $resultFromFunction;
+			} catch (ErrorException $e) {
+				$logger->info("Error: ".$e->getMessage());
+				$result = "Error: " . $e->getMessage();
+			}
 
-        $resultFromFunction = $executor->execute($codeFn, $params['data'], $deepClient);
-        return $response->withJson(['resolved' => $resultFromFunction]);
-    } catch (Throwable $e) {
-        $logger->info("An error occurred: " . $e->getMessage());
-        return $response->withJson(['rejected' => "An error occurred: " . $e->getMessage()], 500);
-    }
+			$response->getBody()->write(json_encode(['resolved' => $result]));
+		} catch (Exception $e) {
+			$logger->info("An error occurred: ".$e->getMessage());
+			$response->getBody()->write(json_encode(['rejected' => "An error occurred: ".$e->getMessage()]));
+		}
+	} else {
+		$logger->info('Failed to parse JSON.');
+		$response->getBody()->write(json_encode(['rejected' => 'Failed to parse JSON.']));
+	}
+	return $response->withHeader('Content-Type', 'application/json')->withStatus(200);;
 }
 
 $errorMiddleware->setDefaultErrorHandler(function (Request $request, Throwable $exception, bool $displayErrorDetails)  use ($app, $logger) {
@@ -105,8 +113,8 @@ $app->post('/init', function (Request $request, Response $response) {
 	return $response;
 });
 
-$app->post('/call', 'handleRequest');
-$app->post('/http-call', 'handleRequest');
+$app->post('/call', 'handleRequestExecutor');
+$app->post('/http-call', 'handleRequestExecutor');
 
 // Run app
 $app->run();
