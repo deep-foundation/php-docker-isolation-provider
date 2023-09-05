@@ -40,3 +40,13 @@ docker run -d -p 39090:39090 -e PORT=39090 deepf/js-docker-isolation-provider:ma
 ```bash
 php8.1 vendor/bin/phpunit tests/Feature/CallTest.php
 ```
+
+## Install/Build Deep Client PHP extension implemented in C++
+```bash
+pip install -r requirements.txt
+
+apt-get install autoconf cmake make automake libtool git libboost-all-dev libssl-dev g++
+#apt-get install libboost-python1.74-dev
+cmake .
+make
+```
