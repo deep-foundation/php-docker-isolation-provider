@@ -1,7 +1,7 @@
 name: Deploy deepRunnerPHP
 on:
   push:
-    branches: [ main ]
+    branches: [ main-off ]
   workflow_dispatch:
 defaults:
   run:
