@@ -85,7 +85,7 @@ public:
                         return float_value;
                     } else if (PyUnicode_Check(pyResult)) {
                         const char* str_value = PyUnicode_AsUTF8(pyResult);
-                        return str_value;
+                        throw Php::Exception(str_value);
                     } else if (PyList_Check(pyResult)) {
                         return PyPhpBridge::convertPyListToPhpArray(pyResult);
                     } else if (PyTuple_Check(pyResult)) {
