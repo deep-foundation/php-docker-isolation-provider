@@ -53,40 +53,33 @@ class CodeExecutor {
     }
 }
 
-function callExecutor(Request $request, Response $response) use ($app, $logger) {
-	$data = json_decode((string)$request->getBody(), true);
+function handleRequest(Request $request, Response $response) {
+    global $logger;
+    $data = json_decode((string)$request->getBody(), true);
 
-	if ($data) {
-		try {
-			$params = $data['params'] ?? [];
-			$code = $params['code'] ?? '';
-			$jwt = $params['jwt'] ?? '';
-			$url = sprintf("http://%s", getenv('GQL_URN') ?: '192.168.0.135:3006/gql');
+    if (!$data) {
+        $logger->info('Failed to parse JSON.');
+        return $response->withJson(['rejected' => 'Failed to parse JSON.'], 400);
+    }
 
-			$codeFn = str_replace('function fn(', 'function func(', $code);
-			$codeFn = str_replace("\\n", "\n", $codeFn);
+    try {
+        $params = $data['params'] ?? [];
+        $code = $params['code'] ?? '';
+        $jwt = $params['jwt'] ?? '';
+        $url = sprintf("http://%s", getenv('GQL_URN') ?: '192.168.0.135:3006/gql');
 
-			$executor = new CodeExecutor();
-			$deepClient = new DeepClientPhpWrapper($jwt, $url);
+        $codeFn = str_replace('function fn(', 'function func(', $code);
+        $codeFn = str_replace("\\n", "\n", $codeFn);
 
-			try {
-				$resultFromFunction = $executor->execute($codeFn, $params['data'], $deepClient);
-				$result = $resultFromFunction;
-			} catch (ErrorException $e) {
-				$logger->info("Error: ".$e->getMessage());
-				$result = "Error: " . $e->getMessage();
-			}
+        $executor = new CodeExecutor($logger);
+        $deepClient = new DeepClientPhpWrapper($jwt, $url);
 
-			$response->getBody()->write(json_encode(['resolved' => $result]));
-		} catch (Exception $e) {
-			$logger->info("An error occurred: ".$e->getMessage());
-			$response->getBody()->write(json_encode(['rejected' => "An error occurred: ".$e->getMessage()]));
-		}
-	} else {
-		$logger->info('Failed to parse JSON.');
-		$response->getBody()->write(json_encode(['rejected' => 'Failed to parse JSON.']));
-	}
-	return $response->withHeader('Content-Type', 'application/json')->withStatus(200);;
+        $resultFromFunction = $executor->execute($codeFn, $params['data'], $deepClient);
+        return $response->withJson(['resolved' => $resultFromFunction]);
+    } catch (Throwable $e) {
+        $logger->info("An error occurred: " . $e->getMessage());
+        return $response->withJson(['rejected' => "An error occurred: " . $e->getMessage()], 500);
+    }
 }
 
 $errorMiddleware->setDefaultErrorHandler(function (Request $request, Throwable $exception, bool $displayErrorDetails)  use ($app, $logger) {
@@ -112,9 +105,8 @@ $app->post('/init', function (Request $request, Response $response) {
 	return $response;
 });
 
-$app->post('/call', callExecutor);
-
-$app->post('/http-call', callExecutor);
+$app->post('/call', 'handleRequest');
+$app->post('/http-call', 'handleRequest');
 
 // Run app
 $app->run();
