@@ -79,7 +79,7 @@ def serial(token: str, url: str, async_serial_params: Dict) -> dict | str:
     return execute_async(_serial, deep_client, async_serial_params)
 
 
-async def id(token: str, url: str, start: Any, *path: Any) -> int | str:
+def id(token: str, url: str, start: Any, *path: Any) -> int | str:
     async def _id(client, start, *path):
         return await client.id(start, *path)
 
