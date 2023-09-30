@@ -69,11 +69,11 @@ public:
         if (deepClientModule) {
             PyObject* pyFunc = PyObject_GetAttrString(deepClientModule, function_name.c_str());
             if (pyFunc && PyCallable_Check(pyFunc)) {
-                PyObject* pyArgs = PyTuple_Pack(4,
+                PyObject* pyArgs = PyTuple_Pack(query2.isNull() ? 3 : 4,
                     Py_BuildValue("s", token.c_str()),
                     Py_BuildValue("s", url.c_str()),
                     PyPhpBridge::convertPhpValueToPyObject(query),
-                    query2.isNull() ? Py_None : PyPhpBridge::convertPhpValueToPyObject(query2)
+                    query2.isNull() ? nullptr : PyPhpBridge::convertPhpValueToPyObject(query2)
                 );
                 PyObject* pyResult = PyObject_CallObject(pyFunc, pyArgs);
                 if (pyResult) {
