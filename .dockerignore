@@ -3,6 +3,7 @@
 .gitignore
 .idea
 call-test/
+cmake-build-debug/
 CMakeFiles/
 common/
 config/
@@ -15,11 +16,13 @@ TSRM/
 vendor/
 zend/
 zend_headers/
+venv/
 result.png
 .env
 checklist.md
 README.md
 Dockerfile.old
+LICENSE
 Makefile
 *.cmake
 *.cpp

@@ -61,18 +61,19 @@ public:
     }
 
     Php::Value id(Php::Parameters &params) {
-        return call_python_function("id", params[0]);
+        return call_python_function("id", params[0], params[1]);
     }
 
-    Php::Value call_python_function(const std::string& function_name, const Php::Value& query) {
+    Php::Value call_python_function(const std::string& function_name, const Php::Value& query, const Php::Value& query2 = nullptr) {
         Php::Value result;
         if (deepClientModule) {
             PyObject* pyFunc = PyObject_GetAttrString(deepClientModule, function_name.c_str());
             if (pyFunc && PyCallable_Check(pyFunc)) {
-                PyObject* pyArgs = PyTuple_Pack(3,
+                PyObject* pyArgs = PyTuple_Pack(4,
                     Py_BuildValue("s", token.c_str()),
                     Py_BuildValue("s", url.c_str()),
-                    PyPhpBridge::convertPhpValueToPyObject(query)
+                    PyPhpBridge::convertPhpValueToPyObject(query),
+                    query2.isNull() ? Py_None : PyPhpBridge::convertPhpValueToPyObject(query2)
                 );
                 PyObject* pyResult = PyObject_CallObject(pyFunc, pyArgs);
                 if (pyResult) {
@@ -157,7 +158,8 @@ extern "C" {
             Php::ByVal("query")
         });
         deepClientPhpWrapper.method<&DeepClientPhpWrapper::id>("id", {
-            Php::ByVal("query")
+            Php::ByVal("query"),
+            Php::ByVal("query2")
         });
         extension.add(std::move(deepClientPhpWrapper));
 
