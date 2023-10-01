@@ -63,6 +63,22 @@ function fn($data) {
 }
 ```
 
+```php
+function fn($data) {
+    $new_record = array(
+        "string" => [
+            "data" => [
+                "value" => strrev("DeepFoundation")
+            ]
+        ],
+        "type_id" => $data['deep']->id("@deep-foundation/core", "Symbol"),
+        "from_id" => $data['data']['newLink']['id'],
+        "to_id" => $data['data']['newLink']['id']
+    );
+    return $data['deep']->insert($new_record);
+}
+```
+
 
 ## Install/Build Deep Client PHP extension implemented in C++
 ```bash
